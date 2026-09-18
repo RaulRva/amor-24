@@ -86,9 +86,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     setMoreOpen(false);
   }, [pathname]);
 
-  async function signOut() {
-    await createClient().auth.signOut();
-    router.replace("/login");
+  async function leaveSpace() {
+    if (!window.confirm("¿Salir de este espacio? Luego podéis crear uno nuevo o uniros a otro.")) return;
+    const { error } = await createClient().rpc("leave_couple");
+    if (error) return;
+    router.replace("/unirse");
     router.refresh();
   }
 
@@ -138,7 +140,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 {link.label}
               </Link>
             ))}
-            <button className="more-item" onClick={signOut}>
+            <button className="more-item" onClick={leaveSpace}>
               Salir
             </button>
           </div>

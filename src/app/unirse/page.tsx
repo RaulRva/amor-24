@@ -86,6 +86,17 @@ export default function JoinPage() {
           </form>
         </Card>
         {error ? <p className="text-sm text-rose">{error}</p> : null}
+        <button
+          type="button"
+          className="mt-2 text-sm text-ink-soft"
+          onClick={async () => {
+            await createClient().auth.signOut();
+            router.replace("/login");
+            router.refresh();
+          }}
+        >
+          Cerrar sesión
+        </button>
       </div>
     </div>
   );
