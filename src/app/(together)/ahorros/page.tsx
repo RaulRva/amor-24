@@ -155,6 +155,24 @@ export default function SavingsPage() {
     load();
   }
 
+  async function removeGoal() {
+    if (!goal) return;
+    if (!window.confirm("¿Borrar la meta y todo lo ahorrado?")) return;
+    setError(null);
+    const supabase = createClient();
+    const { error: deleteError } = await supabase.from("savings_goals").delete().eq("id", goal.id);
+    if (deleteError) {
+      setError("No se ha podido borrar la meta.");
+      return;
+    }
+    setGoal(null);
+    setEntries([]);
+    setTitle("");
+    setTarget("");
+    setMonthly("");
+    setEditing(false);
+  }
+
   return (
     <div>
       <PageHeader
@@ -189,6 +207,11 @@ export default function SavingsPage() {
             </Field>
             {error ? <p className="text-sm text-rose">{error}</p> : null}
             <Button type="submit">{goal ? "Guardar cambios" : "Crear meta"}</Button>
+            {goal ? (
+              <button type="button" className="text-sm text-rose" onClick={removeGoal}>
+                Borrar meta
+              </button>
+            ) : null}
           </form>
         </Card>
       ) : (
@@ -214,6 +237,9 @@ export default function SavingsPage() {
             <Button tone="ghost" onClick={() => setEditing(true)}>
               Cambiar meta
             </Button>
+            <button type="button" className="min-h-11 w-full text-sm text-rose" onClick={removeGoal}>
+              Borrar meta
+            </button>
           </div>
 
           <Card className="mb-5">

@@ -114,6 +114,22 @@ export default function MapPage() {
     setError(null);
   }
 
+  async function remove(place: Place) {
+    if (!window.confirm("¿Borrar este punto del mapa?")) return;
+    const supabase = createClient();
+    const { error: deleteError } = await supabase.from("places").delete().eq("id", place.id);
+    if (deleteError) {
+      setError("No se ha podido borrar.");
+      return;
+    }
+    setPlaces((current) => current.filter((item) => item.id !== place.id));
+    if (focus?.id === place.id) {
+      setFocus(null);
+      setName("");
+      setNote("");
+    }
+  }
+
   return (
     <div>
       <PageHeader
@@ -151,6 +167,9 @@ export default function MapPage() {
               >
                 Llévame allí
               </a>
+              <button type="button" className="text-sm text-rose" onClick={() => remove(focus)}>
+                Borrar punto
+              </button>
             </div>
           </form>
         </Card>
@@ -160,13 +179,16 @@ export default function MapPage() {
           <Empty>El mapa está vacío. Toca donde quieras guardar el primer punto.</Empty>
         ) : null}
         {places.map((place) => (
-          <button key={place.id} className="text-left" onClick={() => selectPlace(place)}>
-            <Card className={focus?.id === place.id ? "border-ink" : ""}>
+          <Card key={place.id} className={focus?.id === place.id ? "border-ink" : ""}>
+            <button type="button" className="w-full text-left" onClick={() => selectPlace(place)}>
               <p className="font-serif text-2xl">{place.name}</p>
               {place.note ? <p className="mt-1 text-ink-soft">{place.note}</p> : null}
               <p className="mt-3 text-xs tracking-[0.18em] text-rose uppercase">Ir al punto</p>
-            </Card>
-          </button>
+            </button>
+            <button type="button" className="mt-4 text-sm text-rose" onClick={() => remove(place)}>
+              Borrar
+            </button>
+          </Card>
         ))}
       </div>
     </div>

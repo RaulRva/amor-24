@@ -45,6 +45,13 @@ export default function CountdownPage() {
     load();
   }
 
+  async function remove(item: Countdown) {
+    if (!window.confirm("¿Borrar esta cuenta atrás?")) return;
+    const supabase = createClient();
+    await supabase.from("countdowns").delete().eq("id", item.id);
+    load();
+  }
+
   return (
     <div>
       <PageHeader kicker="lo que esperáis" title="Cuentas atrás" copy="Un viaje, un aniversario, un viernes." />
@@ -79,6 +86,9 @@ export default function CountdownPage() {
               <p className="mt-2 text-ink-soft">
                 {left.past ? "Ya llegó." : `${left.days} días y ${left.hours} horas`}
               </p>
+              <button type="button" className="mt-4 text-sm text-rose" onClick={() => remove(item)}>
+                Borrar
+              </button>
             </Card>
           );
         })}

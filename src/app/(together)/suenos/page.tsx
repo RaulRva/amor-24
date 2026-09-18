@@ -47,6 +47,13 @@ export default function DreamsPage() {
     load();
   }
 
+  async function remove(item: Dream) {
+    if (!window.confirm("¿Borrar este sueño?")) return;
+    const supabase = createClient();
+    await supabase.from("dreams").delete().eq("id", item.id);
+    load();
+  }
+
   return (
     <div>
       <PageHeader kicker="la lista de los dos" title="Sueños" copy="Sitios, planes, locuras. Se van tachando." />
@@ -69,15 +76,20 @@ export default function DreamsPage() {
       <div className="grid gap-3">
         {items.length === 0 ? <Empty>El primero puede ser pequeño. O absurdo.</Empty> : null}
         {items.map((item) => (
-          <button key={item.id} onClick={() => toggle(item)} className="text-left">
-            <Card className={item.done ? "opacity-55" : ""}>
+          <Card key={item.id}>
+            <button type="button" onClick={() => toggle(item)} className={`w-full text-left ${item.done ? "opacity-55" : ""}`}>
               <p className={`font-serif text-2xl ${item.done ? "line-through" : ""}`}>{item.title}</p>
               {item.note ? <p className="mt-2 text-sm text-ink-soft">{item.note}</p> : null}
               <p className="mt-3 text-xs tracking-[0.18em] text-rose uppercase">
                 {item.done ? "hecho" : "pendiente"}
               </p>
-            </Card>
-          </button>
+            </button>
+            {item.done ? (
+              <button type="button" className="mt-4 text-sm text-rose" onClick={() => remove(item)}>
+                Borrar
+              </button>
+            ) : null}
+          </Card>
         ))}
       </div>
     </div>
